@@ -2,45 +2,42 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-creds')
-        IMAGE_NAME = "nrodage21005/myfiles"
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-creds') // Jenkins credentials ID
+        IMAGE_NAME = "nrodage21005/myfiles" // Docker Hub image name
     }
 
     stages {
         stage('Clone Repository') {
             steps {
                 git 'https://github.com/1312namrata/assignmentethans.git'
-
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${IMAGE_NAME}")
+                    dockerImage = docker.build("${IMAGE_NAME}")
                 }
             }
         }
 
-        stage('Login to Docker Hub') {
+        stage('Login to Docker Hub and Push') {
             steps {
                 script {
-                    docker.withRegistry('', nrodage21005) {
-                        echo "Logged into Docker Hub"
+                    docker.withRegistry('', DOCKER_HUB_CREDENTIALS) {
+                        dockerImage.push('latest')
                     }
                 }
             }
         }
+    }
 
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    def image = docker.build("${IMAGE_NAME}")
-                    docker.withRegistry('', nrodage21005) {
-                        image.push('latest')
-                    }
-                }
-            }
+    post {
+        success {
+            echo "✅ Docker image pushed: ${IMAGE_NAME}:latest"
+        }
+        failure {
+            echo "❌ Pipeline failed"
         }
     }
 }

@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-creds')
+        IMAGE_NAME = "nrodage21005/my-app"
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/yourusername/my-app.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE_NAME}")
+                }
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('', DOCKER_HUB_CREDENTIALS) {
+                        echo "Logged into Docker Hub"
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    def image = docker.build("${IMAGE_NAME}")
+                    docker.withRegistry('', DOCKER_HUB_CREDENTIALS) {
+                        image.push('latest')
+                    }
+                }
+            }
+        }
+    }
+}

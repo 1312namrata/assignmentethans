@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-creds')
-        IMAGE_NAME = "nrodage21005/my-app"
+        IMAGE_NAME = "nrodage21005/myfiles"
     }
 
     stages {
@@ -24,7 +24,7 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry('', DOCKER_HUB_CREDENTIALS) {
+                    docker.withRegistry('', nrodage21005/myfiles) {
                         echo "Logged into Docker Hub"
                     }
                 }
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     def image = docker.build("${IMAGE_NAME}")
-                    docker.withRegistry('', DOCKER_HUB_CREDENTIALS) {
+                    docker.withRegistry('', nrodage21005/myfiles) {
                         image.push('latest')
                     }
                 }

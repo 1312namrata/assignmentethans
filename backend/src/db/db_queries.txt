@@ -1,0 +1,79 @@
+--users TABLE
+-- sequence for user.id generation
+CREATE SEQUENCE IF NOT EXISTS elaniti_seq;
+-- enum type for user status
+CREATE TYPE user_status_enum AS ENUM ('pending', 'active', 'inactive', 'rejected', 'suspended', 'system');
+
+
+
+
+--levels TABLE
+CREATE TABLE levels (
+    level_id     VARCHAR(50) PRIMARY KEY,
+    level_name   VARCHAR(100) NOT NULL UNIQUE,
+    description  TEXT,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by   VARCHAR(50) NOT NULL,
+    is_deleted   BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at   TIMESTAMPTZ DEFAULT NULL,
+    deleted_by   VARCHAR(50) DEFAULT NULL
+);
+
+
+--regions TABLE
+CREATE TABLE regions (
+    region_id     VARCHAR(50) NOT NULL,
+    level_id      VARCHAR(50) NOT NULL,
+    regions_name  TEXT,
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by    VARCHAR(50) NOT NULL,
+    is_deleted    BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at    TIMESTAMPTZ DEFAULT NULL,
+    deleted_by    VARCHAR(50) DEFAULT NULL,
+    
+    CONSTRAINT pk_regions PRIMARY KEY (region_id, level_id),
+    CONSTRAINT fk_regions_level FOREIGN KEY (level_id)
+        REFERENCES levels (level_id)
+        ON DELETE CASCADE
+);
+
+
+
+
+--For tenant_field_year TABLE
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+-- basic checks
+ALTER TABLE tenant_field_year   
+  ADD CONSTRAINT chk_start_first_of_month CHECK (date_trunc('month', start_month) = start_month),
+  ADD CONSTRAINT chk_end_first_of_month CHECK (date_trunc('month', end_month_excl) = end_month_excl),
+  ADD CONSTRAINT chk_positive_length CHECK (start_month < end_month_excl);
+
+ADD CONSTRAINT no_overlap_for_user_field EXCLUDE USING GIST (       --this prevents overlap ranges, and akses sure that tenat_id+field +range are also unique
+  user_id  WITH =,
+  field_id WITH =,
+  period   WITH &&
+);
+
+
+
+--tenants TABLE
+-- create enum type used by tenants. run once.
+CREATE TYPE tenant_type_enum AS ENUM ('farming', 'external');
+
+CREATE TABLE tenants (
+    tenant_id      VARCHAR(50) PRIMARY KEY,
+    tenant_type    tenant_type_enum NOT NULL,
+    description    TEXT,
+    superadmin_id  VARCHAR(50) DEFAULT NULL,
+    admin_id       VARCHAR(50) DEFAULT NULL,
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    is_suspended   BOOLEAN NOT NULL DEFAULT FALSE,
+    suspended_at   TIMESTAMPTZ DEFAULT NULL,
+
+    CONSTRAINT fk_tenants_superadmin FOREIGN KEY (superadmin_id)
+        REFERENCES superadmin (id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_tenants_admin FOREIGN KEY (admin_id)
+        REFERENCES users (id)
+        ON DELETE CASCADE
+);

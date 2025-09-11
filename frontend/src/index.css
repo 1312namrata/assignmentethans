@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+
+
+
+
+
+
+body {
+  margin: 0;
+  /* font-family: 'Inter', sans-serif; */
+  
+}
+ 
+ 
+
+
+ @theme {
+   --color-primary-main: #11008F;
+  --color-primary-light1: #F4F2FF;
+  --color-primary-light2: #DAD3FF;
+  --color-primary-dark: #07003F;
+
+  --color-secondary-main:#9D007B;
+  --color-secondary-light1:#FFF4FD;
+  --color-secondary-light2:#FED1F5;
+  --color-secondary-dark1:#62004D;
+
+  --color-spectrum-white:#FFFFFF;
+  --color-spectrum-white2:#FFFFF9;
+  --color-spectrum-gray1: #F4F4F4;
+  --color-spectrum-gray2:#D1D1D1;
+  --color-spectrum-gray3:#838383;
+  --color-spectrum-gray4:#4D4D4D;
+  --color-spectrum-black:#000000;
+
+  --color-RAG-spectrum-red:#F4C3AB;
+  --color-RAG-spectrum-amber:#FFE7CE;
+  --color-RAG-spectrum-green:#D6DFB9;
+  --color-RAG-spectrum-grayscaleR:#CECECE;
+  --color-RAG-spectrum-grayscaleA:#EBEBEB;
+  --color-RAG-spectrum-grayscaleG:#D7D7D7;
+  
+
+--font-sans: 'Public Sans', sans-serif;
+
+
+
+} 
